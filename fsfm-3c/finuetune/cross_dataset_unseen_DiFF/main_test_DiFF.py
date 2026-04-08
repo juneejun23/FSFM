@@ -36,10 +36,10 @@ import models_vit
 
 
 cross_dataset_test_path = {
-    'T2I': '../../../datasets/finetune_datasets/diffusion_facial_forgery_detection/DiFF/test_subsets/T2I',
-    'I2I': "../../../datasets/finetune_datasets/diffusion_facial_forgery_detection/DiFF/test_subsets/I2I",
-    "FS": "../../../datasets/finetune_datasets/diffusion_facial_forgery_detection/DiFF/test_subsets/FS",
-    'FE': "../../../datasets/finetune_datasets/diffusion_facial_forgery_detection/DiFF/test_subsets/FE",
+    'T2I': '/media/NAS/DATASET/FSFM/DiFF/DiFF/test_subsets/T2I',
+    'I2I': "/media/NAS/DATASET/FSFM/DiFF/DiFF/test_subsets/I2I",
+    "FS": "/media/NAS/DATASET/FSFM/DiFF/DiFF/test_subsets/FS",
+    'FE': "/media/NAS/DATASET/FSFM/DiFF/DiFF/test_subsets/FE",
 }
 
 

@@ -1,0 +1,23 @@
+# Checkpoints
+*.pth
+*.pt
+checkpoint/
+
+# Logs
+*.log
+*.tfevents*
+
+# Data
+*.tar.gz
+*.zip
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# Conda
+*.egg-info/
+dist/
+build/

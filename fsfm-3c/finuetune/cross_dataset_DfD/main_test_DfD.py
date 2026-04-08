@@ -35,10 +35,10 @@ import models_vit
 
 
 cross_dataset_test_path = {
-    'Celeb-DF-v2': "../../../datasets/finetune_datasets/deepfakes_detection/Celeb-DF-v2/32_frames",
-    'DFDC': "../../../datasets/finetune_datasets/deepfakes_detection/DFDC/32_frames",
-    'DFDCP': "../../../datasets/finetune_datasets/deepfakes_detection/DFDCP/32_frames",
-    'WDF': "../../../datasets/finetune_datasets/deepfakes_detection/deepfake_in_the_wild",
+    'Celeb-DF-v2': "/media/NAS/DATASET/FSFM/CelebDF-v2/Celeb-DF-v2/32_frames",
+    'DFDC': "/media/NAS/DATASET/FSFM/DFDC/DFDC/32_frames",
+    'DFDCP': "/media/NAS/DATASET/FSFM/DFDCP/DFDCP/32_frames",
+    'WDF': "/media/NAS/DATASET/FSFM/WildDeepfake/deepfake_in_the_wild",
 }
 
 

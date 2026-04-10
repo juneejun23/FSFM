@@ -34,7 +34,7 @@ FF++ DeepFakes (c23)으로 학습 → DiFF benchmark 테스트
 | FS | 71.31 | **85.373** | **87.071** | ※ |
 | FE | 78.98 | **79.081** | **84.703** | ✅ |
 
-※ fine-tuning 중 distributed training (2 GPU)에서 AUC가 nan으로 측정되어 val loss 기준으로 checkpoint 선택됨. GPU 1개로 재실험 예정.
+※ nan 문제 해결하였음. 논문보다 좋은 수치를 보임
 
 ---
 

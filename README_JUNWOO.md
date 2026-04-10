@@ -254,7 +254,6 @@ CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=1 PYTHONWARNINGS="ignore" torchrun \
 
 ### Fine-tuning (FF++ DeepFakes subset으로 학습)
 
-GPU 1개 사용 권장 (2개 사용 시 val AUC가 nan으로 측정되는 문제 있음)
 
 ```bash
 cd /home/<username>/projects/FSFM/fsfm-3c/finuetune/cross_dataset_unseen_DiFF

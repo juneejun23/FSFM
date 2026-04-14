@@ -38,9 +38,12 @@ def sample_frames(flag, num_frames, dataset_name, args):
         return: the choosen frames' path and label
     """
 
-    if dataset_name in ['casia', 'replay', 'oulu', 'msu', 'celeb']:
-        root = '../../../datasets/finetune_datasets/face_anti_spoofing/data/MCIO/frame/'
-        dataroot = '../../../datasets/finetune_datasets/face_anti_spoofing/data/MCIO/txt/'
+    if dataset_name in ['casia', 'replay', 'oulu', 'msu']:
+        root = '/media/NAS/DATASET/FAS_FSFM/'
+        dataroot = '/home/junwoo/projects/FSFM/fsfm-3c/finuetune/cross_dataset_unseen_DiFF/data/MCIO/txt/'
+    elif dataset_name == 'celeb':
+        root = '/media/NAS/DATASET/FAS_FSFM/'
+        dataroot = '/home/junwoo/projects/FSFM/fsfm-3c/finuetune/cross_dataset_unseen_DiFF/data/MCIO/txt/'
     else:
         root = '../../../datasets/finetune_datasets/face_anti_spoofing/data/WCS/frame/'
         dataroot = '../../../datasets/finetune_datasets/face_anti_spoofing/data/WCS/txt/'

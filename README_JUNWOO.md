@@ -23,6 +23,19 @@ FF++ (c23)으로 학습 → unseen 데이터셋 테스트
 
 ---
 
+### Table 2: Cross-domain Face Anti-Spoofing (HTER% / AUC%)
+
+MCIO 프로토콜 (0-shot): 4개 데이터셋 중 1개를 target으로, 나머지 + CelebA-Spoof로 학습
+
+| 프로토콜 | 논문 HTER | 재현 HTER | 논문 AUC | 재현 AUC |
+|---|---|---|---|---|
+| ICM→O | - | 🔄 학습 중 | - | 🔄 학습 중 |
+| OIM→C | - | 🔄 학습 중 | - | 🔄 학습 중 |
+| OCM→I | - | 🔄 학습 중 | - | 🔄 학습 중 |
+| OCI→M | - | 🔄 학습 중 | - | 🔄 학습 중 |
+
+---
+
 ### Table 3: Unseen Diffusion Facial Forgery Detection (Frame-level AUC)
 
 FF++ DeepFakes (c23)으로 학습 → DiFF benchmark 테스트
@@ -34,7 +47,7 @@ FF++ DeepFakes (c23)으로 학습 → DiFF benchmark 테스트
 | FS | 71.31 | **85.373** | **87.071** | ※ |
 | FE | 78.98 | **79.081** | **84.703** | ✅ |
 
-※ nan 문제 해결하였음. 논문보다 좋은 수치를 보임
+
 
 ---
 
@@ -60,11 +73,11 @@ nvidia-smi
 
 ### 3. 나머지 패키지 설치
 
-requirements.txt에 torch 관련 줄이 있어서 제외하고 설치:
 ```bash
 grep -v "torch" requirements.txt > requirements_notorch.txt
 pip install -r requirements_notorch.txt
 pip install huggingface_hub submitit tensorboard scikit-learn torchsummary timm==0.4.5
+pip install pandas opencv-python-headless --break-system-packages
 ```
 
 ---
@@ -80,35 +93,65 @@ PyTorch 2.6부터 `torch.load` 기본값 변경으로 아래 파일들을 수정
 - `fsfm-3c/finuetune/cross_dataset_unseen_DiFF/main_finetune_DiFF.py`
 - `fsfm-3c/finuetune/cross_dataset_unseen_DiFF/main_test_DiFF.py`
 - `fsfm-3c/util/misc.py`
+- `fsfm-3c/finuetune/cross_domain_FAS/fas.py`
 
 ---
 
-## NAS 경로 정리
+## NAS 현황
+
+### Checkpoints `/media/NAS/USERS/junwoo/FSFM_checkpoints/`
 
 ```
-/media/NAS/DATASET/FSFM/
-├── FaceForensics/     # FF++ (fine-tuning용)
-│   └── FaceForensics/32_frames/
-│       ├── DS_FF++_all_cls/c23/   # DfD fine-tuning용
-│       └── DS_FF++_each_cls/c23/  # DiFF fine-tuning용
-│           └── DeepFakes/
-├── CelebDF-v2/        # DfD test
-├── DFDC/              # DfD test
-├── DFDCP/             # DfD test
-├── WildDeepfake/      # DfD test
-└── DiFF/              # DiFF test
-    └── DiFF/test_subsets/
-        ├── T2I/
-        ├── I2I/
-        ├── FS/
-        └── FE/
+VF2_ViT-B/
+├── checkpoint-400.pth          # pretrained checkpoint (메인)
+└── checkpoint-te-400.pth       # EMA checkpoint
+```
 
-/media/NAS/USERS/junwoo/FSFM_checkpoints/
-├── VF2_ViT-B/                         # pretrained checkpoint
-│   └── checkpoint-400.pth
-└── finetuned_FF++/                    # DfD fine-tuned checkpoint
-    └── 1266365/
-        └── checkpoint-min_val_loss.pth
+> DfD fine-tuned checkpoint는 현재 로컬에만 있음:
+> `/home/junwoo/projects/FSFM/fsfm-3c/finuetune/cross_dataset_DfD/checkpoint/.../checkpoint-min_val_loss.pth`
+> DiFF fine-tuned checkpoint도 로컬에 있음:
+> `./checkpoint/junwoo/experiments_finetune/2gpu_AUC_fixed/`
+
+### 데이터셋 `/media/NAS/DATASET/`
+
+**DfD / DiFF 데이터 (`FSFM/`)**
+```
+FSFM/
+├── FaceForensics/   # FF++ 32_frames (fine-tuning용)
+├── CelebDF-v2/      # DfD test
+├── DFDC/            # DfD test
+├── DFDCP/           # DfD test
+├── WildDeepfake/    # DfD test
+└── DiFF/            # DiFF test
+```
+
+**FAS 전처리 데이터 (`FAS_FSFM/`)** — face2 기반, 224×224, frame0/frame1
+```
+FAS_FSFM/
+├── casia/  {train,test}/{real,fake}/
+├── msu/    {train,test}/{real,fake}/
+├── replay/ {train,test}/{real,fake}/
+├── oulu/   {train,test}/{real,fake}/
+└── celeb/  {real,fake}/             # CelebA-Spoof (각 40,000장)
+```
+
+**FAS 원본 데이터 (`FAS_copy/`)**
+```
+FAS_copy/
+├── face/        # 256×256 리사이즈 버전
+├── face2/       # MTCNN 원본 크롭 (전처리 소스)
+├── face3/       # 256×256 리사이즈 버전
+└── depthface2/  # depth map
+```
+
+**기타**
+```
+CelebA-Spoof/    # CelebA-Spoof 원본 (72GB)
+celeba/          # CelebA (DDPM 학습용)
+DFDP/            # deepfake video detection 데이터셋 (CLASS04)
+cifar10/
+mnist/
+tiny_imagenet/
 ```
 
 ---
@@ -120,12 +163,6 @@ cd /home/<username>/projects/FSFM
 python fsfm-3c/pretrain/download_pretrained_weitghts.py
 ```
 
-다운로드된 checkpoint는 NAS로 이동:
-```bash
-mv ./checkpoint/pretrained_models /media/NAS/USERS/<username>/FSFM_checkpoints
-ln -s /media/NAS/USERS/<username>/FSFM_checkpoints ./checkpoint/pretrained_models
-```
-
 또는 이미 다운로드된 checkpoint 사용:
 ```
 /media/NAS/USERS/junwoo/FSFM_checkpoints/VF2_ViT-B/checkpoint-400.pth
@@ -134,8 +171,6 @@ ln -s /media/NAS/USERS/<username>/FSFM_checkpoints ./checkpoint/pretrained_model
 ---
 
 ## 데이터셋 다운로드
-
-데이터셋은 NAS에 저장합니다.
 
 ### 1. 폴더 생성
 
@@ -202,6 +237,25 @@ ln -s /media/NAS/DATASET/FSFM/DiFF/DiFF/test_subsets/FS/test FS/val
 ln -s /media/NAS/DATASET/FSFM/DiFF/DiFF/test_subsets/FE/test FE/val
 ```
 
+### 5. FAS 데이터셋 준비
+
+FAS 데이터는 별도 전처리가 필요합니다. `/media/NAS/DATASET/FAS_copy/face2/` 에 원본이 있어야 합니다.
+
+```bash
+# MCIO 데이터셋 전처리 (face2 기반, frame0/frame1 추출)
+python /home/junwoo/projects/FSFM/datasets/finetune/preprocess/convert_v2.py
+
+# CelebA-Spoof 전처리
+python /home/junwoo/projects/FSFM/datasets/finetune/preprocess/convert_celeb.py
+```
+
+전처리 결과:
+- CASIA: train(real=60, fake=180), test(real=90, fake=270) 비디오 × 2프레임
+- MSU: train(real=30, fake=90), test(real=40, fake=120) 비디오 × 2프레임
+- Replay: train(real=60, fake=300), test(real=80, fake=400) 비디오 × 2프레임
+- Oulu: train(real=360, fake=1440), test(real=360, fake=1440) 비디오 × 2프레임
+- CelebA-Spoof: train(real=40,000, fake=40,000) 이미지
+
 ---
 
 ## Table 1: DfD Fine-tuning 및 Test
@@ -230,11 +284,6 @@ CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=1 torchrun \
     --finetune_data_path '/media/NAS/DATASET/FSFM/FaceForensics/FaceForensics/32_frames/DS_FF++_all_cls/c23'
 ```
 
-또는 이미 fine-tuning된 checkpoint 사용:
-```
-/media/NAS/USERS/junwoo/FSFM_checkpoints/finetuned_FF++/1266365/checkpoint-min_val_loss.pth
-```
-
 ### Test
 
 ```bash
@@ -250,10 +299,57 @@ CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=1 PYTHONWARNINGS="ignore" torchrun \
 
 ---
 
+## Table 2: FAS Fine-tuning 및 Test
+
+### utils.py 경로 수정 (이미 적용됨)
+
+```python
+# fsfm-3c/finuetune/cross_domain_FAS/utils/utils.py
+if dataset_name in ['casia', 'replay', 'oulu', 'msu']:
+    root = '/media/NAS/DATASET/FAS_FSFM/'
+    dataroot = '/home/junwoo/projects/FSFM/fsfm-3c/finuetune/cross_dataset_unseen_DiFF/data/MCIO/txt/'
+elif dataset_name == 'celeb':
+    root = '/media/NAS/DATASET/FAS_FSFM/'
+    dataroot = '/home/junwoo/projects/FSFM/fsfm-3c/finuetune/cross_dataset_unseen_DiFF/data/MCIO/txt/'
+```
+
+### Fine-tuning (4개 프로토콜 × 5 runs)
+
+```bash
+cd /home/<username>/projects/FSFM/fsfm-3c/finuetune/cross_domain_FAS
+bash run_all.sh
+```
+
+run_all.sh 내용:
+```bash
+#!/bin/bash
+cd /home/junwoo/projects/FSFM/fsfm-3c/finuetune/cross_domain_FAS
+
+PT_MODEL='/media/NAS/USERS/junwoo/FSFM_checkpoints/VF2_ViT-B/checkpoint-400.pth'
+
+for config in C I M O; do
+    echo "=== Config $config ==="
+    mkdir -p ./results/${config}
+    CUDA_VISIBLE_DEVICES=0 python train_vit.py \
+        --config $config \
+        --pt_model $PT_MODEL \
+        --normalize_from_IMN \
+        --op_dir "./results/${config}" \
+        --report_logger_path "./results/${config}/report.log"
+    echo "=== Config $config DONE ==="
+done
+
+echo "ALL DONE!"
+```
+
+- 각 config당 내부에서 seed 0~4로 5번 자동 반복 (총 4 × 5 = 20번 학습)
+- config당 약 2시간, 전체 약 8시간 소요
+
+---
+
 ## Table 3: DiFF Fine-tuning 및 Test
 
 ### Fine-tuning (FF++ DeepFakes subset으로 학습)
-
 
 ```bash
 cd /home/<username>/projects/FSFM/fsfm-3c/finuetune/cross_dataset_unseen_DiFF

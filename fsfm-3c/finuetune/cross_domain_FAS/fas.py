@@ -45,7 +45,7 @@ class feature_generator(nn.Module):
                 drop_path_rate=args.drop_path,
             )
 
-            checkpoint = torch.load(args.pt_model, map_location='cpu')
+            checkpoint = torch.load(args.pt_model, map_location='cpu', weights_only=False)
             print("Load pre-trained checkpoint from: %s" % args.pt_model)
             if 'model' in checkpoint:  # for MAE(CVPR22) and Ours models
                 checkpoint_model = checkpoint['model']
